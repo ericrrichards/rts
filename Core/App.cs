@@ -14,6 +14,7 @@ namespace Core {
     public abstract class App {
         public static App GApp;
         public static Device GDevice;
+        public static Random Rand;
 
         protected string MainWindowCaption;
         protected DeviceType DevType;
@@ -36,6 +37,7 @@ namespace Core {
             D3DObject = null;
             Paused = false;
             PP = new PresentParameters();
+            Rand = new Random();
             InitMainWindow();
             InitDirect3D();
         }
@@ -118,7 +120,7 @@ namespace Core {
 
         }
 
-        private void Exit() {
+        protected void Exit() {
             _running = false;
             Application.Exit();
         }
