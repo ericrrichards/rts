@@ -38,12 +38,8 @@ namespace Hello {
         }
 
         ~HelloD3D() {
-            if (_font != null) {
-                _font.Dispose();
-                _font = null;
-            }
+            ReleaseCom(_font);
         }
-
 
         public override void OnLostDevice() {
             _font.OnLostDevice();

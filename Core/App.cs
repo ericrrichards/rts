@@ -9,6 +9,7 @@ namespace Core {
     using System.Threading;
     using System.Windows.Forms;
 
+    using SlimDX;
     using SlimDX.Direct3D9;
 
     public abstract class App {
@@ -189,6 +190,13 @@ namespace Core {
                 return false;
             }
             return false;
-        } 
+        }
+
+        protected static void ReleaseCom(ComObject o) {
+            if (o != null) {
+                o.Dispose();
+                o = null;
+            }
+        }
     }
 }
