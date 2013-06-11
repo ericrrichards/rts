@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SlimDX;
 
 namespace Core {
     public struct Point : IEquatable<Point> {
@@ -66,59 +64,6 @@ namespace Core {
         }
         public bool InRect(Rectangle r) {
             return r.Contains(X, Y);
-        }
-
-    }
-
-    public class Debug {
-        private static volatile Debug _debug;
-        private static readonly object SyncRoot = new object();
-        public static Debug Logger{
-            get {
-                if (_debug == null) {
-                    lock (SyncRoot) {
-                        if (_debug == null) {
-                            _debug = new Debug();
-                        }
-                    }
-                }
-                return _debug;
-            }
-
-        }
-        private readonly StreamWriter _out;
-
-        private Debug() {
-            _out = new StreamWriter( new FileStream("out.txt", FileMode.OpenOrCreate));
-        }
-        ~Debug() {
-            if (_out != null) {
-                _out.Close();
-            }
-        }
-
-        public void Print(string fmt, params object[] args) {
-            _out.WriteLine(fmt, args);
-        }
-        public void Endl(int nr = 1) {
-            for (int i = 0; i < nr; i++) {
-                _out.WriteLine();
-            }
-        }
-        public void Write(Vector3 v) {
-            _out.Write("x: {0} y: {1} z:{2}", v.X, v.Y, v.Z);
-        }
-        public void Write(bool b) {
-            _out.Write(b? "True":"False");
-        }
-        public void Write(string s) {
-            _out.Write(s);
-        }
-        public void Write(float f) {
-            _out.Write(f);
-        }
-        public void Write(int i) {
-            _out.Write(i);
         }
 
     }
