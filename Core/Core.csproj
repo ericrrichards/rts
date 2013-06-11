@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Debug.cs" />
+    <Compile Include="GameObject.cs" />
+    <Compile Include="HeightMap.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

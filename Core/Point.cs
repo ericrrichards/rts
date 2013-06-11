@@ -55,9 +55,13 @@ namespace Core {
         public static Point operator /(Point p, int rhs) {
             return new Point(p.X/rhs, p.Y/rhs);
         }
+        public static Point operator /(Point p, Point p2) {
+            return new Point(p.X / p2.X, p.Y / p2.Y);
+        }
         public static Point operator *(Point p, int rhs) {
             return new Point(p.X * rhs, p.Y * rhs);
         }
+
 
         public float Distance(Point p2) {
             return (float) Math.Sqrt((X-p2.X)*(X-p2.X) + (Y-p2.Y)*(Y-p2.Y));

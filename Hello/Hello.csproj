@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Hello.ExamplePicker</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86" />
     <Reference Include="System" />
@@ -44,6 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExamplePicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExamplePicker.Designer.cs">
+      <DependentUpon>ExamplePicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HeightMapExample1.cs" />
     <Compile Include="HelloD3D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -55,6 +65,11 @@
       <Project>{7B179F5D-1CC5-4C48-8C2D-B840E891DC15}</Project>
       <Name>Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ExamplePicker.resx">
+      <DependentUpon>ExamplePicker.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
