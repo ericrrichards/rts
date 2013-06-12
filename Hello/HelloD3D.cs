@@ -3,17 +3,17 @@ using System.Drawing;
 using Core;
 using SlimDX;
 using SlimDX.Direct3D9;
+using SlimDX.DirectInput;
 using Font = SlimDX.Direct3D9.Font;
+using Point = Core.Point;
+using ResultCode = SlimDX.Direct3D9.ResultCode;
 
 namespace Hello {
-    using System.Diagnostics;
-    using System.Windows.Forms;
-
-
     public class HelloD3D : App {
-        public HelloD3D(){}
+        
 
-    public override string GetName() {
+
+        public override string GetName() {
             return "Hello D3D";
         }
         
@@ -31,47 +31,11 @@ namespace Hello {
             return ResultCode.Success;
         }
 
-        protected Device CreateDevice(int width, int height, bool windowed) {
-            var d3D9 = CreateDirect3D();
-            if (d3D9 == null) {
-                return null;
-            }
-            var caps = d3D9.GetDeviceCaps(0, DeviceType.Hardware);
-            CreateFlags vp = caps.DeviceCaps.HasFlag(DeviceCaps.HWTransformAndLight) ?
-                                 CreateFlags.HardwareVertexProcessing :
-                                 CreateFlags.SoftwareVertexProcessing;
-
-            if (caps.VertexShaderVersion < new Version(2, 0) || caps.PixelShaderVersion < new Version(2, 0)) {
-                Core.Debug.Print("Warning - Your graphic card does not support vertex and pixel shaders version 2.0");
-            }
-
-            var pp = new PresentParameters {
-                BackBufferWidth = width,
-                BackBufferHeight = height,
-                BackBufferFormat = Format.A8R8G8B8,
-                BackBufferCount = 1,
-                Multisample = MultisampleType.None,
-                MultisampleQuality = 0,
-                SwapEffect = SwapEffect.Discard,
-                DeviceWindowHandle = _mainWindow.Handle,
-                Windowed = windowed,
-                EnableAutoDepthStencil = true,
-                AutoDepthStencilFormat = Format.D24S8,
-                PresentFlags = PresentFlags.None,
-                FullScreenRefreshRateInHertz = 0,
-                PresentationInterval = PresentInterval.Immediate
-            };
-            Device device = null;
-            try {
-                device = new Device(d3D9, 0, DeviceType.Hardware, _mainWindow.Handle, vp, pp);
-            } catch (Exception ex) {
-                Core.Debug.Print("Failed to create Device - {0}", ex.Message);
-            }
-            d3D9.Dispose();
-            return device;
-        }
-
         public override Result Update(float dt) {
+            if (Input.IsKeyDown(Key.Escape)) {
+                Quit();
+            }
+            
             return ResultCode.Success;
         }
         public override Result Render() {

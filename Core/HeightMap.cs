@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using SlimDX.Direct3D9;
 
 namespace Core {
+    [StructLayout(LayoutKind.Sequential)]
     internal struct Particle {
         public Vector3 Position;
         public Color4 Color;
@@ -16,7 +19,7 @@ namespace Core {
     }
 
 
-    class HeightMap :GameObject{
+    public class HeightMap :GameObject{
         private Point _size;
         private float _maxHeight;
         private float[] _heightMap;
@@ -28,6 +31,7 @@ namespace Core {
         private Texture _heightMapTexture;
 
         public HeightMap(Device device, Point size) {
+            System.Diagnostics.Debug.Assert(device != null);
             try {
                 _device = device;
                 _size = size;
@@ -59,13 +63,15 @@ namespace Core {
 
                 ReleaseCom(_heightMapTexture);
 
-                _heightMapTexture = Texture.FromFile(_device, filename);
+                _heightMapTexture = Texture.FromFile(_device, filename,_size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default, Filter.Default, Filter.Default, 0);
 
                 var dr = _heightMapTexture.LockRectangle(0, LockFlags.None);
                 for (int y = 0; y < _size.Y; y++) {
                     for (int x = 0; x < _size.X; x++) {
-                        var c = dr.Data.Read<Color4>();
-                        _heightMap[x + y*_size.X] = c.Red*_maxHeight;
+                        dr.Data.Seek(y*dr.Pitch + x, SeekOrigin.Begin);
+                        
+                        var b = dr.Data.Read<byte>();
+                        _heightMap[x + y*_size.X] = b/255.0f*_maxHeight;
                     }
                 }
                 _heightMapTexture.UnlockRectangle(0);
@@ -85,11 +91,11 @@ namespace Core {
                     for (int x = 0; x < _size.X; x++) {
                         var prc = _heightMap[x + y*_size.X]/_maxHeight;
                         var red = prc;
-                        var green = 1.0f - prc;
+                        var green =1.0f - prc;
 
                         var v = new Particle() {
-                            Color = new Color4(red, green, 0),
-                            Position = new Vector3(x, _heightMap[x+y*_size.X], -y)
+                            Color = new Color4(1.0f, red, green, 0.0f),
+                            Position = new Vector3((float)x, _heightMap[x+y*_size.X], -(float)y)
                         };
                         ds.Write(v);
 
@@ -123,7 +129,7 @@ namespace Core {
                 }
                 if (_sprite != null) {
                     _sprite.Begin(SpriteFlags.None);
-                    _sprite.Draw(_heightMapTexture, Color.White);
+                    _sprite.Draw(_heightMapTexture, null, null, new Vector3(1.0f, 1.0f, 1.0f), Color.White);
                     _sprite.End();
                 }
             } catch (Exception ex) {
@@ -131,6 +137,19 @@ namespace Core {
             }
         }
         public Vector2 Center { get { return new Vector2(_size.X /2.0f, _size.Y / 2.0f);}}
-
+        public float MaxHeight { get { return _maxHeight; } set { _maxHeight = value; } }
     }
+    public static class MathF {
+        public static float Sin(float a) {
+            return (float) Math.Sin(a);
+        }
+        public static float Cos(float a) {
+            return (float)Math.Cos(a);
+        }
+
+        public static float Pi {
+            get { return (float) Math.PI; }
+        }
+    }
+
 }

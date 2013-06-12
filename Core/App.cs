@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using SlimDX.Direct3D9;
+using SlimDX.DirectInput;
+using Device = SlimDX.Direct3D9.Device;
+using DeviceType = SlimDX.Direct3D9.DeviceType;
 
 namespace Core {
     using System.Windows.Forms;
@@ -31,9 +34,10 @@ namespace Core {
         public abstract Result Cleanup();
 
         public void Quit() {
-                IsRunning = false;
-                _mainWindow.Close();
-                _mainWindow = null;
+            Input.Destroy();
+            IsRunning = false;
+            _mainWindow.Close();
+            _mainWindow = null;
             //Application.Exit();
         }
 
@@ -57,37 +61,76 @@ namespace Core {
                 Text = GetName(),
                 FormBorderStyle = FormBorderStyle.None
             };
-            _mainWindow.KeyDown += (sender, args) => {
-                if (args.KeyCode == Keys.Escape) {
-                    Quit();
-                }
-            };
+            
             
 
             _mainWindow.Show();
             _mainWindow.Update();
+            Input.Init(_mainWindow);
         }
 
         public void Main(string[] args) {
-            
+
 
             if (Init(800, 600, true).IsFailure) {
                 return;
             }
-            var timer = new Stopwatch();
-            timer.Start();
+            var startTime = Stopwatch.GetTimestamp();
             while (IsRunning) {
-                
-                    Application.DoEvents();
-                    var dt = timer.ElapsedMilliseconds*0.001f;
-                
-                    Update(dt);
+
+                Application.DoEvents();
+
+                var t = Stopwatch.GetTimestamp();
+
+                var dt = (t- startTime)/ (float)Stopwatch.Frequency;
+
+                Update(dt);
                 lock (syncRoot) {
                     Render();
                 }
-                timer.Restart();
+                startTime = t;
             }
             Cleanup();
+        }
+
+        protected Device CreateDevice(int width, int height, bool windowed) {
+            var d3D9 = CreateDirect3D();
+            if (d3D9 == null) {
+                return null;
+            }
+            var caps = d3D9.GetDeviceCaps(0, DeviceType.Hardware);
+            var vp = caps.DeviceCaps.HasFlag(DeviceCaps.HWTransformAndLight) ?
+                                 CreateFlags.HardwareVertexProcessing :
+                                 CreateFlags.SoftwareVertexProcessing;
+
+            if (caps.VertexShaderVersion < new Version(2, 0) || caps.PixelShaderVersion < new Version(2, 0)) {
+                Debug.Print("Warning - Your graphic card does not support vertex and pixel shaders version 2.0");
+            }
+
+            var pp = new PresentParameters {
+                BackBufferWidth = width,
+                BackBufferHeight = height,
+                BackBufferFormat = Format.A8R8G8B8,
+                BackBufferCount = 1,
+                Multisample = MultisampleType.None,
+                MultisampleQuality = 0,
+                SwapEffect = SwapEffect.Discard,
+                DeviceWindowHandle = _mainWindow.Handle,
+                Windowed = windowed,
+                EnableAutoDepthStencil = true,
+                AutoDepthStencilFormat = Format.D24S8,
+                PresentFlags = PresentFlags.None,
+                FullScreenRefreshRateInHertz = 0,
+                PresentationInterval = PresentInterval.Immediate
+            };
+            Device device = null;
+            try {
+                device = new Device(d3D9, 0, DeviceType.Hardware, _mainWindow.Handle, vp, pp);
+            } catch (Exception ex) {
+                Debug.Print("Failed to create Device - {0}", ex.Message);
+            }
+            d3D9.Dispose();
+            return device;
         }
     }
 }
