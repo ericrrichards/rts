@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using SlimDX.Direct3D9;
 using SlimDX.DirectInput;
 using Device = SlimDX.Direct3D9.Device;
 using DeviceType = SlimDX.Direct3D9.DeviceType;
+using Font = SlimDX.Direct3D9.Font;
 
 namespace Core {
     using System.Windows.Forms;
@@ -107,10 +109,11 @@ namespace Core {
                 Debug.Print("Warning - Your graphic card does not support vertex and pixel shaders version 2.0");
             }
 
+            var format = (windowed) ? Format.Unknown : Format.A8R8G8B8;
             var pp = new PresentParameters {
                 BackBufferWidth = width,
                 BackBufferHeight = height,
-                BackBufferFormat = Format.A8R8G8B8,
+                BackBufferFormat = format,
                 BackBufferCount = 1,
                 Multisample = MultisampleType.None,
                 MultisampleQuality = 0,
@@ -130,6 +133,19 @@ namespace Core {
                 Debug.Print("Failed to create Device - {0}", ex.Message);
             }
             d3D9.Dispose();
+            System.Diagnostics.Debug.Assert(device != null, "device != null");
+            System.Diagnostics.Debug.Assert(device.ComPointer != IntPtr.Zero);
+            try {
+                device.GetRenderState(RenderState.Lighting);
+
+            } catch (Exception ex) {
+                Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
+                return null;
+            }
+            device.Material = new Material() {
+                Diffuse = Color.White
+            };
+
             return device;
         }
     }

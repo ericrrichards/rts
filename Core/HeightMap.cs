@@ -13,9 +13,9 @@ namespace Core {
     [StructLayout(LayoutKind.Sequential)]
     internal struct Particle {
         public Vector3 Position;
-        public Color4 Color;
+        public int Color;
         public static readonly VertexFormat FVF = VertexFormat.Position | VertexFormat.Diffuse;
-        public const int Size = 28;
+        public const int Size = 16;
     }
 
 
@@ -85,17 +85,18 @@ namespace Core {
             try {
                 ReleaseCom(_vb);
                 _vb = new VertexBuffer(_device, _size.X*_size.Y*Particle.Size, Usage.Dynamic | Usage.Points | Usage.WriteOnly, Particle.FVF, Pool.Default);
-
+                Debug.Print("{0}", _device.Material.Diffuse.ToArgb());
                 var ds = _vb.Lock(0, 0, LockFlags.Discard);
                 for (int y = 0; y < _size.Y; y++) {
                     for (int x = 0; x < _size.X; x++) {
                         var prc = _heightMap[x + y*_size.X]/_maxHeight;
+                        //Debug.Print("prc: {0}", prc);
                         var red = prc;
                         var green =1.0f - prc;
 
                         var v = new Particle() {
-                            Color = new Color4(1.0f, red, green, 0.0f),
-                            Position = new Vector3((float)x, _heightMap[x+y*_size.X], -(float)y)
+                            Position = new Vector3(x, _heightMap[x+y*_size.X], -y),
+                            Color = new Color4(1.0f, red, green, 0.0f).ToArgb()
                         };
                         ds.Write(v);
 
@@ -112,7 +113,7 @@ namespace Core {
             try {
                 if (_vb != null) {
                     _device.SetRenderState(RenderState.Lighting, false);
-                    _device.SetRenderState(RenderState.PointScaleEnable, true);
+                    _device.SetRenderState(RenderState.PointSpriteEnable, true);
                     _device.SetRenderState(RenderState.PointScaleEnable, true);
 
                     _device.SetRenderState(RenderState.PointSize, 0.7f);

@@ -31,6 +31,16 @@ namespace Hello {
 
             _font = new Font(_device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
+            _heightmap = new HeightMap(_device, new Point(100, 100));
+            if (_heightmap.LoadFromFile("images/abe.jpg").IsFailure) {
+                Debug.Print("failed to load from file");
+                Quit();
+            }
+            if (_heightmap.CreateParticles().IsFailure) {
+                Debug.Print("Failed to create particles");
+                Quit();
+            }
+
             IsRunning = true;
 
             return ResultCode.Success;
@@ -38,15 +48,7 @@ namespace Hello {
 
         public override Result Update(float dt) {
             if (_heightmap == null) {
-                _heightmap = new HeightMap(_device, new Point(100, 100));
-                if (_heightmap.LoadFromFile("images/abe.jpg").IsFailure) {
-                    Debug.Print("failed to load from file");
-                    Quit();
-                }
-                if (_heightmap.CreateParticles().IsFailure) {
-                    Debug.Print("Failed to create particles");
-                    Quit();
-                }
+                
             } else {
                 _angle += dt*0.5f;
                 var center = _heightmap.Center;
