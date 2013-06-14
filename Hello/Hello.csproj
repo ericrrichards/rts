@@ -54,6 +54,7 @@
       <DependentUpon>ExamplePicker.cs</DependentUpon>
     </Compile>
     <Compile Include="HeightMapExample1.cs" />
+    <Compile Include="HeightMapExample2.cs" />
     <Compile Include="HelloD3D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

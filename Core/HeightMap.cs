@@ -81,11 +81,54 @@ namespace Core {
             }
             return ResultCode.Success;
         }
+        public Result CreateRandomHeightMap(int seed, float noiseSize, float persistence, int octaves) {
+            ReleaseCom(_heightMapTexture);
+            _heightMapTexture = new Texture(_device, _size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default);
+
+            var dr = _heightMapTexture.LockRectangle(0, LockFlags.None);
+            for (int y = 0; y < _size.Y; y++) {
+                for (int x = 0; x < _size.X; x++) {
+                    var xf = (x/(float) _size.X)*noiseSize;
+                    var yf = (y/(float) _size.Y)*noiseSize;
+                    var total = 0.0f;
+
+                    for (int i = 0; i < octaves; i++) {
+                        var freq = MathF.Pow(2.0f, i);
+                        var amp = MathF.Pow(persistence, i);
+
+                        var tx = xf*freq;
+                        var ty = yf*freq;
+                        var txi = (int) tx;
+                        var tyi = (int) ty;
+                        var fracX = tx -txi;
+                        var fracY = ty - tyi;
+
+                        var v1 = MathF.Noise(txi + tyi*57 + seed);
+                        var v2 = MathF.Noise(txi + 1 + tyi*57 + seed);
+                        var v3 = MathF.Noise(txi + (tyi+1) * 57 + seed);
+                        var v4 = MathF.Noise(txi+1 + (tyi + 1) * 57 + seed);
+
+                        var i1 = MathF.CosInterpolate(v1, v2, fracX);
+                        var i2 = MathF.CosInterpolate(v3, v4, fracX);
+                        total += MathF.CosInterpolate(i1, i2, fracY)*amp;
+                    }
+                    var b = (int) (128 + total*128.0f);
+                    if (b < 0) b = 0;
+                    if (b > 255) b = 255;
+                    dr.Data.Seek(y*dr.Pitch + x, SeekOrigin.Begin);
+                    dr.Data.Write((byte) b);
+
+                    _heightMap[x + y*_size.X] = (b/255.0f)*_maxHeight;
+                }
+            }
+            _heightMapTexture.UnlockRectangle(0);
+            return ResultCode.Success;
+        }
         public Result CreateParticles() {
             try {
                 ReleaseCom(_vb);
                 _vb = new VertexBuffer(_device, _size.X*_size.Y*Particle.Size, Usage.Dynamic | Usage.Points | Usage.WriteOnly, Particle.FVF, Pool.Default);
-                Debug.Print("{0}", _device.Material.Diffuse.ToArgb());
+                
                 var ds = _vb.Lock(0, 0, LockFlags.Discard);
                 for (int y = 0; y < _size.Y; y++) {
                     for (int x = 0; x < _size.X; x++) {
@@ -140,17 +183,4 @@ namespace Core {
         public Vector2 Center { get { return new Vector2(_size.X /2.0f, _size.Y / 2.0f);}}
         public float MaxHeight { get { return _maxHeight; } set { _maxHeight = value; } }
     }
-    public static class MathF {
-        public static float Sin(float a) {
-            return (float) Math.Sin(a);
-        }
-        public static float Cos(float a) {
-            return (float)Math.Cos(a);
-        }
-
-        public static float Pi {
-            get { return (float) Math.PI; }
-        }
-    }
-
 }

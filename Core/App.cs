@@ -72,7 +72,7 @@ namespace Core {
         }
 
         public void Main(string[] args) {
-
+            SlimDX.Configuration.EnableObjectTracking = true;
 
             if (Init(800, 600, true).IsFailure) {
                 return;
