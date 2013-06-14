@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{fea0f6c9-01ba-41b3-93f3-7bbdfebc5222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{bacb21ac-44d2-45ed-9baa-a7fde011997a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{cb4dec4c-cf6d-4ffa-8741-26287ce81d2c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="intpoint.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="app.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

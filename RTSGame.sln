@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{7C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hello", "Hello\Hello.csproj", "{2B68D788-95E5-41FB-A8F7-7F1CBF218CE8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example 3", "..\..\rts-master\Chapter 3\Example 3.1\Example 3.1.vcxproj", "{BF6DBAB3-0422-4E07-A95F-C77992482618}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,21 +41,11 @@ Global
 		{2B68D788-95E5-41FB-A8F7-7F1CBF218CE8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2B68D788-95E5-41FB-A8F7-7F1CBF218CE8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2B68D788-95E5-41FB-A8F7-7F1CBF218CE8}.Release|Win32.ActiveCfg = Release|Any CPU
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Debug|Win32.ActiveCfg = Debug|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Debug|Win32.Build.0 = Debug|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Release|Any CPU.ActiveCfg = Release|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Release|Win32.ActiveCfg = Release|Win32
-		{BF6DBAB3-0422-4E07-A95F-C77992482618}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{BF6DBAB3-0422-4E07-A95F-C77992482618} = {DD86D15D-B98E-4806-93A3-73F90790EF9A}
 		{7B179F5D-1CC5-4C48-8C2D-B840E891DC15} = {8AF7E9E9-0DCD-4E21-9BC4-5CAF1DCB77F7}
 		{7CF5FA45-4065-4BDB-B893-6361B11966C1} = {8AF7E9E9-0DCD-4E21-9BC4-5CAF1DCB77F7}
 		{2B68D788-95E5-41FB-A8F7-7F1CBF218CE8} = {7CF5FA45-4065-4BDB-B893-6361B11966C1}
