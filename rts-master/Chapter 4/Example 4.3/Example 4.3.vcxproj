@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Example 4-2</ProjectName>
-    <ProjectGuid>{F2D317B1-2A00-4815-A846-CB9962240575}</ProjectGuid>
+    <ProjectName>Example 4-3</ProjectName>
+    <ProjectGuid>{2D081506-37F2-4906-A231-A3F42E7555E1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -64,9 +64,9 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;d3dx9.lib;d3d9.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)Example 4-2.exe</OutputFile>
+      <OutputFile>$(OutDir)Example 4-3.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)Example 4-2.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)Example 4-3.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -98,8 +98,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="debug.cpp" />
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="debug.cpp" />
     <ClCompile Include="heightMap.cpp" />
   </ItemGroup>
   <ItemGroup>

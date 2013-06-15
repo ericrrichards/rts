@@ -10,6 +10,8 @@ using SlimDX;
 using SlimDX.Direct3D9;
 
 namespace Core {
+    using System.Threading;
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct Particle {
         public Vector3 Position;
@@ -23,6 +25,7 @@ namespace Core {
         private Point _size;
         private float _maxHeight;
         private float[] _heightMap;
+        private Rectangle _selectRect;
 
         // temp rendering stuff
         private VertexBuffer _vb;
@@ -42,6 +45,8 @@ namespace Core {
 
                 _heightMap = new float[_size.X*_size.Y];
 
+                _selectRect = new Rectangle(_size.X/ 2 - 5,_size.Y / 2 - 5,10,10);
+                
                 _vb = null;
                 _heightMapTexture = null;
             } catch (Exception ex) {
@@ -130,8 +135,8 @@ namespace Core {
                 _vb = new VertexBuffer(_device, _size.X*_size.Y*Particle.Size, Usage.Dynamic | Usage.Points | Usage.WriteOnly, Particle.FVF, Pool.Default);
                 
                 var ds = _vb.Lock(0, 0, LockFlags.Discard);
-                for (int y = 0; y < _size.Y; y++) {
-                    for (int x = 0; x < _size.X; x++) {
+                for (var y = 0; y < _size.Y; y++) {
+                    for (var x = 0; x < _size.X; x++) {
                         var prc = _heightMap[x + y*_size.X]/_maxHeight;
                         //Debug.Print("prc: {0}", prc);
                         var red = prc;
@@ -139,7 +144,7 @@ namespace Core {
 
                         var v = new Particle() {
                             Position = new Vector3(x, _heightMap[x+y*_size.X], -y),
-                            Color = new Color4(1.0f, red, green, 0.0f).ToArgb()
+                            Color = (_selectRect.Contains(x,y)) ? new Color4(1.0f, 0,0,1.0f).ToArgb() : new Color4(1.0f, red, green, 0.0f).ToArgb()
                         };
                         ds.Write(v);
 
@@ -180,7 +185,67 @@ namespace Core {
                 Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
             }
         }
+
+        // Editor functions
+        public void MoveRect(Direction dir) {
+            switch (dir) {
+                case Direction.Left:
+                    _selectRect.Location.Offset(-1,0);
+                    break;
+                case Direction.Right:
+                    _selectRect.Location.Offset(1, 0);
+                    break;
+                case Direction.Up:
+                    _selectRect.Location.Offset(0, -1);
+                    break;
+                case Direction.Down:
+                    _selectRect.Location.Offset(0, 1);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("dir");
+            }
+            Thread.Sleep(100);
+            CreateParticles();
+        }
+        public void RaiseTerrain(Rectangle r, float f) {
+            for (var y = r.Top; y <= r.Bottom; y++) {
+                for (var x = r.Left; x <= r.Right; x++) {
+                    var i = x + y * _size.X;
+                    _heightMap[i] += f;
+                    if (_heightMap[i] < -_maxHeight) _heightMap[i] = -_maxHeight;
+                    if ( _heightMap[i] > _maxHeight )_heightMap[i] = _maxHeight;
+                }
+            }
+            CreateParticles();
+        }
+        public void SmoothTerrain() {
+            var hm = new float[_size.X * _size.Y];
+            for (var y = 0; y < _size.X; y++) {
+                for (var x = 0; x < _size.X; x++) {
+                    var totalHeight = 0.0f;
+                    var numNodes = 0;
+                    for (var y1 = y-1; y1 <= y+1; y1++) {
+                        for (var x1 = x-1; x1 <= x+1; x1++) {
+                            if (x1 < 0 || x1 >= _size.X || y1 < 0 || y1 >= _size.Y) {
+                                continue;
+                            }
+                            totalHeight += _heightMap[x1 + y1 * _size.X];
+                            numNodes++;
+                        }
+                    }
+                    hm[x + y * _size.X] = totalHeight / numNodes;
+                }
+            }
+            _heightMap = hm;
+            CreateParticles();
+            Thread.Sleep(500);
+        }
+
         public Vector2 Center { get { return new Vector2(_size.X /2.0f, _size.Y / 2.0f);}}
         public float MaxHeight { get { return _maxHeight; } set { _maxHeight = value; } }
+    }
+
+    public enum Direction {
+        Left,Right, Up, Down
     }
 }
