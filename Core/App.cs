@@ -72,7 +72,7 @@ namespace Core {
         }
 
         public void Main(string[] args) {
-            SlimDX.Configuration.EnableObjectTracking = true;
+            Configuration.EnableObjectTracking = true;
 
             if (Init(800, 600, true).IsFailure) {
                 return;
@@ -101,9 +101,9 @@ namespace Core {
                 return null;
             }
             var caps = d3D9.GetDeviceCaps(0, DeviceType.Hardware);
-            var vp = caps.DeviceCaps.HasFlag(DeviceCaps.HWTransformAndLight) ?
-                                 CreateFlags.HardwareVertexProcessing :
-                                 CreateFlags.SoftwareVertexProcessing;
+            var vp = CreateFlags.Multithreaded | (caps.DeviceCaps.HasFlag(DeviceCaps.HWTransformAndLight) ?
+                                 CreateFlags.HardwareVertexProcessing  :
+                                 CreateFlags.SoftwareVertexProcessing);
 
             if (caps.VertexShaderVersion < new Version(2, 0) || caps.PixelShaderVersion < new Version(2, 0)) {
                 Debug.Print("Warning - Your graphic card does not support vertex and pixel shaders version 2.0");

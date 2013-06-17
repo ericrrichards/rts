@@ -71,8 +71,8 @@ namespace Core {
                 _heightMapTexture = Texture.FromFile(_device, filename,_size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default, Filter.Default, Filter.Default, 0);
 
                 var dr = _heightMapTexture.LockRectangle(0, LockFlags.None);
-                for (int y = 0; y < _size.Y; y++) {
-                    for (int x = 0; x < _size.X; x++) {
+                for (var y = 0; y < _size.Y; y++) {
+                    for (var x = 0; x < _size.X; x++) {
                         dr.Data.Seek(y*dr.Pitch + x, SeekOrigin.Begin);
                         
                         var b = dr.Data.Read<byte>();
@@ -142,9 +142,10 @@ namespace Core {
                         var red = prc;
                         var green =1.0f - prc;
 
-                        var v = new Particle() {
+                        bool contains = x >= _selectRect.Left && x <= _selectRect.Right && y >= _selectRect.Top && y <= _selectRect.Bottom;
+                        var v = new Particle {
                             Position = new Vector3(x, _heightMap[x+y*_size.X], -y),
-                            Color = (_selectRect.Contains(x,y)) ? new Color4(1.0f, 0,0,1.0f).ToArgb() : new Color4(1.0f, red, green, 0.0f).ToArgb()
+                            Color = (ShowSelection && contains) ? new Color4(1.0f, 0,0,1.0f).ToArgb() : new Color4(1.0f, red, green, 0.0f).ToArgb()
                         };
                         ds.Write(v);
 
@@ -176,7 +177,7 @@ namespace Core {
                     _device.SetStreamSource(0, _vb, 0, Particle.Size);
                     _device.DrawPrimitives(PrimitiveType.PointList, 0, _size.X*_size.Y);
                 }
-                if (_sprite != null) {
+                if (_sprite != null  && _heightMapTexture != null) {
                     _sprite.Begin(SpriteFlags.None);
                     _sprite.Draw(_heightMapTexture, null, null, new Vector3(1.0f, 1.0f, 1.0f), Color.White);
                     _sprite.End();
@@ -190,16 +191,16 @@ namespace Core {
         public void MoveRect(Direction dir) {
             switch (dir) {
                 case Direction.Left:
-                    _selectRect.Location.Offset(-1,0);
+                    _selectRect.X--;
                     break;
                 case Direction.Right:
-                    _selectRect.Location.Offset(1, 0);
+                    _selectRect.X++;
                     break;
                 case Direction.Up:
-                    _selectRect.Location.Offset(0, -1);
+                    _selectRect.Y--;
                     break;
                 case Direction.Down:
-                    _selectRect.Location.Offset(0, 1);
+                    _selectRect.Y++;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("dir");
@@ -242,7 +243,10 @@ namespace Core {
         }
 
         public Vector2 Center { get { return new Vector2(_size.X /2.0f, _size.Y / 2.0f);}}
-        public float MaxHeight { get { return _maxHeight; } set { _maxHeight = value; } }
+        public float MaxHeight { get { return _maxHeight; } private set { _maxHeight = value; } }
+        public bool ShowSelection { get; set; }
+        public Rectangle SelectionRect { get { return _selectRect; } set { _selectRect = value; } }
+        public Point Size { get { return _size; } }
     }
 
     public enum Direction {

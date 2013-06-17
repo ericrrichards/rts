@@ -107,6 +107,7 @@ namespace Hello {
         public override Result Cleanup() {
             ReleaseCom(_font);
             ReleaseCom(_device);
+            _heightmap.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;
         }
