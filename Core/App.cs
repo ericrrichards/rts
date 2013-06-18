@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using SlimDX.Direct3D9;
-using SlimDX.DirectInput;
+
 using Device = SlimDX.Direct3D9.Device;
 using DeviceType = SlimDX.Direct3D9.DeviceType;
 using Font = SlimDX.Direct3D9.Font;
@@ -16,15 +16,14 @@ namespace Core {
 
 
     public abstract class App : GameObject {
-        private readonly object syncRoot = new object();
-        protected Device _device;
-        protected Font _font;
-        protected Form _mainWindow;
+        protected Device Device;
+        protected Font Font;
+        protected Form MainWindow;
 
         protected App() {
-            _mainWindow = null;
-            _device = null;
-            _font = null;
+            MainWindow = null;
+            Device = null;
+            Font = null;
         }
 
         protected bool IsRunning { get; set; }
@@ -38,8 +37,8 @@ namespace Core {
         public void Quit() {
             Input.Destroy();
             IsRunning = false;
-            _mainWindow.Close();
-            _mainWindow = null;
+            MainWindow.Close();
+            MainWindow = null;
             //Application.Exit();
         }
 
@@ -57,7 +56,7 @@ namespace Core {
 
         protected void CreateWindow(int width, int height) {
             Debug.Print("Application initiated");
-            _mainWindow = new Form {
+            MainWindow = new Form {
                 Width = width,
                 Height = height,
                 Text = GetName(),
@@ -66,9 +65,9 @@ namespace Core {
             
             
 
-            _mainWindow.Show();
-            _mainWindow.Update();
-            Input.Init(_mainWindow);
+            MainWindow.Show();
+            MainWindow.Update();
+            Input.Init(MainWindow);
         }
 
         public void Main(string[] args) {
@@ -87,9 +86,7 @@ namespace Core {
                 var dt = (t- startTime)/ (float)Stopwatch.Frequency;
 
                 Update(dt);
-                lock (syncRoot) {
                     Render();
-                }
                 startTime = t;
             }
             Cleanup();
@@ -118,7 +115,7 @@ namespace Core {
                 Multisample = MultisampleType.None,
                 MultisampleQuality = 0,
                 SwapEffect = SwapEffect.Discard,
-                DeviceWindowHandle = _mainWindow.Handle,
+                DeviceWindowHandle = MainWindow.Handle,
                 Windowed = windowed,
                 EnableAutoDepthStencil = true,
                 AutoDepthStencilFormat = Format.D24S8,
@@ -128,7 +125,7 @@ namespace Core {
             };
             Device device = null;
             try {
-                device = new Device(d3D9, 0, DeviceType.Hardware, _mainWindow.Handle, vp, pp);
+                device = new Device(d3D9, 0, DeviceType.Hardware, MainWindow.Handle, vp, pp);
             } catch (Exception ex) {
                 Debug.Print("Failed to create Device - {0}", ex.Message);
             }
@@ -142,7 +139,7 @@ namespace Core {
                 Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
                 return null;
             }
-            device.Material = new Material() {
+            device.Material = new Material {
                 Diffuse = Color.White
             };
 

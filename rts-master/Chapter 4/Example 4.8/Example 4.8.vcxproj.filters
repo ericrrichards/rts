@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{95bb837c-4dc8-477c-8541-a558776e51da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{a9c67750-c5ea-4fc5-8e89-d9a5343ddad6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Debug">
+      <UniqueIdentifier>{2051894c-7061-4dc8-8bd8-3f9e5140575b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Shader">
+      <UniqueIdentifier>{4bedc9d3-200f-47ef-b128-b05aa5c3d277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{8b0e7602-5eb0-47bc-b91a-5a2e419df803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Heightmap">
+      <UniqueIdentifier>{22f500f9-843b-46d7-9259-0ad417c3763a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f1af6d62-0925-4e31-ad6e-8c03bc9c4486}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>Common\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>Common\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="app.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="heightMap.cpp">
+      <Filter>Heightmap</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Common\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>Common\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="heightMap.h">
+      <Filter>Heightmap</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Debug\Shaders\terrain.ps">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

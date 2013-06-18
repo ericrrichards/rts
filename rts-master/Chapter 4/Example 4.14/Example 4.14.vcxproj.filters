@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{f948eb36-58e2-4ba5-a518-5a191376fa6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Debug">
+      <UniqueIdentifier>{b12a0fdd-ab6c-485b-bc27-3cb86881d594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Shader">
+      <UniqueIdentifier>{a42d0398-cfea-436f-8309-e933ee6dc5ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{9a6fa90d-3c65-4efd-9db6-fb1a132484b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{945d19bc-f99e-4aa2-8c7b-4b4c58d5189d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{cab524a4-1274-4037-86b9-2618e6f2a024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Heightmap">
+      <UniqueIdentifier>{c09736e8-84e8-4dc9-ad94-bbddd143056c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{f88fd438-41bf-4a62-aed1-d6937ea02623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{c41221df-ad65-4e86-aabd-174e812a0ee6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="intpoint.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Common\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>Common\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="heightMap.h">
+      <Filter>Heightmap</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug.cpp">
+      <Filter>Common\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>Common\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="app.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="heightMap.cpp">
+      <Filter>Heightmap</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Debug\Shaders\terrain.ps">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

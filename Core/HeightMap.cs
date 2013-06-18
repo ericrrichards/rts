@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+
 using SlimDX;
 using SlimDX.Direct3D9;
 
@@ -29,8 +26,8 @@ namespace Core {
 
         // temp rendering stuff
         private VertexBuffer _vb;
-        private Device _device;
-        private Sprite _sprite;
+        private readonly Device _device;
+        private readonly Sprite _sprite;
         private Texture _heightMapTexture;
 
         public HeightMap(Device device, Point size) {

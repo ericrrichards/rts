@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+
 using Core;
 using SlimDX;
 using SlimDX.Direct3D9;
@@ -19,12 +16,12 @@ namespace Hello {
         private float _angle, _angleB;
         public override Result Init(int width, int height, bool windowed) {
             CreateWindow(width, height);
-            _device = CreateDevice(width, height, windowed);
-            if (_device == null) return ResultCode.Failure;
+            Device = CreateDevice(width, height, windowed);
+            if (Device == null) return ResultCode.Failure;
 
-            _font = new Font(_device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
+            Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(_device, new Point(50, 50)) {
+            _heightmap = new HeightMap(Device, new Point(50, 50)) {
                 ShowSelection = true
             };
             if (_heightmap.CreateParticles().IsFailure) {
@@ -52,9 +49,9 @@ namespace Hello {
                 var fov = MathF.Pi/180*45.0f;
                 var proj = Matrix.PerspectiveFovLH(fov, 1.3333f, 1.0f, 1000.0f);
 
-                _device.SetTransform(TransformState.World, world);
-                _device.SetTransform(TransformState.View, view);
-                _device.SetTransform(TransformState.Projection, proj);
+                Device.SetTransform(TransformState.World, world);
+                Device.SetTransform(TransformState.View, view);
+                Device.SetTransform(TransformState.Projection, proj);
 
                 if (Input.IsKeyDown(Key.A) && _heightmap.SelectionRect.Left > 0) {
                     _heightmap.MoveRect(Direction.Left);
@@ -103,8 +100,8 @@ namespace Hello {
         }
 
         public override Result Render() {
-            _device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-            if (_device.BeginScene().IsSuccess && _mainWindow != null) {
+            Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            if (Device.BeginScene().IsSuccess && MainWindow != null) {
                 if (_heightmap != null) {
                     _heightmap.Render();
                 }
@@ -113,22 +110,22 @@ namespace Hello {
                     new Rectangle(10, 10, 0, 0),
                     new Rectangle(10, 30, 0,0),
                     new Rectangle(10, 50, 0,0),
-                    new Rectangle(10, 70, 0,0), 
+                    new Rectangle(10, 70, 0,0)
                 };
 
-                _font.DrawString(null, String.Format("Arrows: Move camera"), rs[0], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _font.DrawString(null, String.Format("WASD: Move selection"), rs[1], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _font.DrawString(null, String.Format("+/-: Raise/Lower terrain"), rs[2], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _font.DrawString(null, String.Format("Space: Smooth terrain"), rs[3], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _device.EndScene();
-                _device.Present();
+                Font.DrawString(null, String.Format("Arrows: Move camera"), rs[0], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Font.DrawString(null, String.Format("WASD: Move selection"), rs[1], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Font.DrawString(null, String.Format("+/-: Raise/Lower terrain"), rs[2], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Font.DrawString(null, String.Format("Space: Smooth terrain"), rs[3], DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Device.EndScene();
+                Device.Present();
             }
             return ResultCode.Success;
         }
 
         public override Result Cleanup() {
-            ReleaseCom(_font);
-            ReleaseCom(_device);
+            ReleaseCom(Font);
+            ReleaseCom(Device);
             _heightmap.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;

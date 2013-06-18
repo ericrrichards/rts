@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{a44daa97-6bed-40ff-bea1-a99ea83175a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Debug">
+      <UniqueIdentifier>{b90f9388-b5e7-4ac3-97f8-8acffc0e6e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{08c71171-88b8-437f-9ef2-764d0f07c83d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{aea3621b-500f-47cf-bd05-34afb18e207f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Heightmap">
+      <UniqueIdentifier>{7c07f8d7-e392-4cb7-992e-d1fa33b01e2e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug.cpp">
+      <Filter>Common\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="app.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="heightMap.cpp">
+      <Filter>Heightmap</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="debug.h">
+      <Filter>Common\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="heightMap.h">
+      <Filter>Heightmap</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

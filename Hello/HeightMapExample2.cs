@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+
 using Core;
 using SlimDX;
 using SlimDX.Direct3D9;
@@ -26,12 +23,12 @@ namespace Hello {
         }
         public override Result Init(int width, int height, bool windowed) {
             CreateWindow(width, height);
-            _device = CreateDevice(width, height, windowed);
-            if (_device == null) return ResultCode.Failure;
+            Device = CreateDevice(width, height, windowed);
+            if (Device == null) return ResultCode.Failure;
 
-            _font = new Font(_device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
+            Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(_device, new Point(100, 100));
+            _heightmap = new HeightMap(Device, new Point(100, 100));
             if (_heightmap.CreateRandomHeightMap(MathF.Rand(2000), _size / 10.0f, _amplitude / 10.0f, 9).IsFailure) {
                 Debug.Print("Failed to create random heightmap");
                 Quit();
@@ -60,9 +57,9 @@ namespace Hello {
                 var view = Matrix.LookAtLH(eye, lookAt, new Vector3(0, 1, 0));
                 var proj = Matrix.PerspectiveFovLH(MathF.Pi / 4, 1.3333f, 1.0f, 1000.0f);
 
-                _device.SetTransform(TransformState.World, world);
-                _device.SetTransform(TransformState.View, view);
-                _device.SetTransform(TransformState.Projection, proj);
+                Device.SetTransform(TransformState.World, world);
+                Device.SetTransform(TransformState.View, view);
+                Device.SetTransform(TransformState.Projection, proj);
 
                 if (Input.IsKeyDown(Key.Space)) {
                     _heightmap.CreateRandomHeightMap(MathF.Rand(2000), _size/10.0f, _amplitude/10.0f, 9);
@@ -90,24 +87,24 @@ namespace Hello {
         }
 
         public override Result Render() {
-            _device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-            if (_device.BeginScene().IsSuccess && _mainWindow != null) {
+            Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            if (Device.BeginScene().IsSuccess && MainWindow != null) {
                 if (_heightmap != null) {
                     _heightmap.Render();
                 }
 
-                _font.DrawString(null, String.Format("Size: {0} \t(UP/DOWN Arrow)", _size), new Rectangle(110, 10, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _font.DrawString(null, String.Format("Persistence: {0} \t(Left/Right Arrow)", _amplitude), new Rectangle(110, 30, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _font.DrawString(null, String.Format("Redraw: (SPACE)"), new Rectangle(110, 50, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
-                _device.EndScene();
-                _device.Present();
+                Font.DrawString(null, String.Format("Size: {0} \t(UP/DOWN Arrow)", _size), new Rectangle(110, 10, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Font.DrawString(null, String.Format("Persistence: {0} \t(Left/Right Arrow)", _amplitude), new Rectangle(110, 30, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Font.DrawString(null, String.Format("Redraw: (SPACE)"), new Rectangle(110, 50, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
+                Device.EndScene();
+                Device.Present();
             }
             return ResultCode.Success;
         }
 
         public override Result Cleanup() {
-            ReleaseCom(_font);
-            ReleaseCom(_device);
+            ReleaseCom(Font);
+            ReleaseCom(Device);
             _heightmap.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;

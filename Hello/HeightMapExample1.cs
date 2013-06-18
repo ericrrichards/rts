@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using System.Threading;
-using System.Threading.Tasks;
+
 using Core;
 using SlimDX;
 using SlimDX.Direct3D9;
@@ -26,12 +22,12 @@ namespace Hello {
 
         public override Result Init(int width, int height, bool windowed) {
             CreateWindow(width, height);
-            _device = CreateDevice(width, height, windowed);
-            if (_device == null) return ResultCode.Failure;
+            Device = CreateDevice(width, height, windowed);
+            if (Device == null) return ResultCode.Failure;
 
-            _font = new Font(_device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
+            Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(_device, new Point(100, 100));
+            _heightmap = new HeightMap(Device, new Point(100, 100));
             if (_heightmap.LoadFromFile("images/abe.jpg").IsFailure) {
                 Debug.Print("failed to load from file");
                 Quit();
@@ -59,9 +55,9 @@ namespace Hello {
                 var view = Matrix.LookAtLH(eye, lookAt, new Vector3(0, 1, 0));
                 var proj = Matrix.PerspectiveFovLH(MathF.Pi/4, 1.3333f, 1.0f, 1000.0f);
 
-                _device.SetTransform(TransformState.World, world);
-                _device.SetTransform(TransformState.View, view);
-                _device.SetTransform(TransformState.Projection, proj);
+                Device.SetTransform(TransformState.World, world);
+                Device.SetTransform(TransformState.View, view);
+                Device.SetTransform(TransformState.Projection, proj);
 
                 if (Input.IsKeyDown(Key.Space)) {
                     _image++;
@@ -88,25 +84,25 @@ namespace Hello {
         }
 
         public override Result Render() {
-            _device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
-            if (_device.BeginScene().IsSuccess && _mainWindow != null) {
+            if (Device.BeginScene().IsSuccess && MainWindow != null) {
 
                 if (_heightmap != null) _heightmap.Render();
 
-                var r = _mainWindow.ClientRectangle;
+                var r = MainWindow.ClientRectangle;
 
-                _font.DrawString(null, "Space: Change Image", r, DrawTextFormat.Left| DrawTextFormat.NoClip | DrawTextFormat.Top, Color.White);
+                Font.DrawString(null, "Space: Change Image", r, DrawTextFormat.Left| DrawTextFormat.NoClip | DrawTextFormat.Top, Color.White);
 
-                _device.EndScene();
-                _device.Present();
+                Device.EndScene();
+                Device.Present();
             }
             return ResultCode.Success;
         }
 
         public override Result Cleanup() {
-            ReleaseCom(_font);
-            ReleaseCom(_device);
+            ReleaseCom(Font);
+            ReleaseCom(Device);
             _heightmap.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;

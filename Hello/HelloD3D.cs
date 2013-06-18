@@ -5,7 +5,6 @@ using SlimDX;
 using SlimDX.Direct3D9;
 using SlimDX.DirectInput;
 using Font = SlimDX.Direct3D9.Font;
-using Point = Core.Point;
 using ResultCode = SlimDX.Direct3D9.ResultCode;
 
 namespace Hello {
@@ -21,10 +20,10 @@ namespace Hello {
         public override Result Init(int width, int height, bool windowed) {
             CreateWindow(width, height);
 
-            _device = CreateDevice(width, height, windowed);
-            if (_device == null) return ResultCode.Failure;
+            Device = CreateDevice(width, height, windowed);
+            if (Device == null) return ResultCode.Failure;
 
-            _font = new Font(_device, 48, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
+            Font = new Font(Device, 48, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
             IsRunning = true;
 
@@ -39,26 +38,26 @@ namespace Hello {
             return ResultCode.Success;
         }
         public override Result Render() {
-            _device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
-            if (_device.BeginScene().IsSuccess && _mainWindow != null) {
-                var r = _mainWindow.ClientRectangle;
+            if (Device.BeginScene().IsSuccess && MainWindow != null) {
+                var r = MainWindow.ClientRectangle;
 
-                _font.DrawString(null, "Hello World!", r, DrawTextFormat.Center | DrawTextFormat.NoClip | DrawTextFormat.VerticalCenter, Color.White);
+                Font.DrawString(null, "Hello World!", r, DrawTextFormat.Center | DrawTextFormat.NoClip | DrawTextFormat.VerticalCenter, Color.White);
 
-                _device.EndScene();
-                _device.Present();
+                Device.EndScene();
+                Device.Present();
             }
             return ResultCode.Success;
         }
         public override Result Cleanup() {
             try {
-                ReleaseCom(_font);
-                ReleaseCom(_device);
+                ReleaseCom(Font);
+                ReleaseCom(Device);
 
-                Core.Debug.Print("Application terminated");
+                Debug.Print("Application terminated");
             } catch (Exception ex) {
-                Core.Debug.Print("Exception in Cleanup - {0}\n{1}", ex.Message, ex.StackTrace);
+                Debug.Print("Exception in Cleanup - {0}\n{1}", ex.Message, ex.StackTrace);
                 return ResultCode.Failure;
             }
             return ResultCode.Success;
