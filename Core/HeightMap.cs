@@ -17,35 +17,22 @@ namespace Core {
         public const int Size = 16;
     }
 
-
     public class HeightMap :GameObject{
         private Point _size;
         private float _maxHeight;
         private float[] _heightMap;
-        private Rectangle _selectRect;
-
-        // temp rendering stuff
-        private VertexBuffer _vb;
         private readonly Device _device;
-        private readonly Sprite _sprite;
-        private Texture _heightMapTexture;
+        public HeightMapRenderer Renderer { private get; set; }
 
-        public HeightMap(Device device, Point size) {
+
+        public HeightMap(Device device, Point size, float maxHeight) {
             System.Diagnostics.Debug.Assert(device != null);
             try {
-                _device = device;
                 _size = size;
-
-                _sprite = new Sprite(_device);
-
-                _maxHeight = 15.0f;
+                _device = device;
+                _maxHeight = maxHeight;
 
                 _heightMap = new float[_size.X*_size.Y];
-
-                _selectRect = new Rectangle(_size.X/ 2 - 5,_size.Y / 2 - 5,10,10);
-                
-                _vb = null;
-                _heightMapTexture = null;
             } catch (Exception ex) {
                 Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
             }
@@ -55,19 +42,32 @@ namespace Core {
         }
         public void Release() {
             _heightMap = null;
-            ReleaseCom(_vb);
-            ReleaseCom(_sprite);
-            ReleaseCom(_heightMapTexture);
+            ReleaseCom(HeightMapTexture);
         }
+        public static HeightMap operator *(HeightMap left, HeightMap right) {
+            var ret = new HeightMap(left._device, left.Size, left.MaxHeight);
+            for (int y = 0; y < left.Size.Y; y++) {
+                for (int x = 0; x < left.Size.X; x++) {
+                    var a = left[x + y*left.Size.X]/left.MaxHeight;
+                    var b = 1.0f;
+                    if (x <= right.Size.X && y <= right.Size.Y) {
+                        b = right[x + y*left.Size.X]/right.MaxHeight;
+                    }
+                    ret[x + y*ret.Size.X] = a*b*left.MaxHeight;
+                }
+            }
+            return ret;
+        }
+
         public Result LoadFromFile(string filename) {
             try {
                 _heightMap = new float[_size.X*_size.Y];
 
-                ReleaseCom(_heightMapTexture);
+                ReleaseCom(HeightMapTexture);
 
-                _heightMapTexture = Texture.FromFile(_device, filename,_size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default, Filter.Default, Filter.Default, 0);
+                HeightMapTexture = Texture.FromFile(_device, filename,_size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default, Filter.Default, Filter.Default, 0);
 
-                var dr = _heightMapTexture.LockRectangle(0, LockFlags.None);
+                var dr = HeightMapTexture.LockRectangle(0, LockFlags.None);
                 for (var y = 0; y < _size.Y; y++) {
                     for (var x = 0; x < _size.X; x++) {
                         dr.Data.Seek(y*dr.Pitch + x, SeekOrigin.Begin);
@@ -76,7 +76,7 @@ namespace Core {
                         _heightMap[x + y*_size.X] = b/255.0f*_maxHeight;
                     }
                 }
-                _heightMapTexture.UnlockRectangle(0);
+                HeightMapTexture.UnlockRectangle(0);
             } catch (Exception ex) {
                 Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
                 return ResultCode.Failure;
@@ -84,10 +84,10 @@ namespace Core {
             return ResultCode.Success;
         }
         public Result CreateRandomHeightMap(int seed, float noiseSize, float persistence, int octaves) {
-            ReleaseCom(_heightMapTexture);
-            _heightMapTexture = new Texture(_device, _size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default);
+            ReleaseCom(HeightMapTexture);
+            HeightMapTexture = new Texture(_device, _size.X, _size.Y, 1, Usage.Dynamic, Format.L8, Pool.Default);
 
-            var dr = _heightMapTexture.LockRectangle(0, LockFlags.None);
+            var dr = HeightMapTexture.LockRectangle(0, LockFlags.None);
             for (int y = 0; y < _size.Y; y++) {
                 for (int x = 0; x < _size.X; x++) {
                     var xf = (x/(float) _size.X)*noiseSize;
@@ -123,88 +123,12 @@ namespace Core {
                     _heightMap[x + y*_size.X] = (b/255.0f)*_maxHeight;
                 }
             }
-            _heightMapTexture.UnlockRectangle(0);
+            HeightMapTexture.UnlockRectangle(0);
             return ResultCode.Success;
         }
-        public Result CreateParticles() {
-            try {
-                ReleaseCom(_vb);
-                _vb = new VertexBuffer(_device, _size.X*_size.Y*Particle.Size, Usage.Dynamic | Usage.Points | Usage.WriteOnly, Particle.FVF, Pool.Default);
-                
-                var ds = _vb.Lock(0, 0, LockFlags.Discard);
-                for (var y = 0; y < _size.Y; y++) {
-                    for (var x = 0; x < _size.X; x++) {
-                        var prc = _heightMap[x + y*_size.X]/_maxHeight;
-                        //Debug.Print("prc: {0}", prc);
-                        var red = prc;
-                        var green =1.0f - prc;
+        
 
-                        bool contains = x >= _selectRect.Left && x <= _selectRect.Right && y >= _selectRect.Top && y <= _selectRect.Bottom;
-                        var v = new Particle {
-                            Position = new Vector3(x, _heightMap[x+y*_size.X], -y),
-                            Color = (ShowSelection && contains) ? new Color4(1.0f, 0,0,1.0f).ToArgb() : new Color4(1.0f, red, green, 0.0f).ToArgb()
-                        };
-                        ds.Write(v);
-
-                    }
-                }
-                _vb.Unlock();
-            } catch (Exception ex) {
-                Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
-                return ResultCode.Failure;
-            }
-            return ResultCode.Success;
-        }
-        public void Render() {
-            try {
-                if (_vb != null) {
-                    _device.SetRenderState(RenderState.Lighting, false);
-                    _device.SetRenderState(RenderState.PointSpriteEnable, true);
-                    _device.SetRenderState(RenderState.PointScaleEnable, true);
-
-                    _device.SetRenderState(RenderState.PointSize, 0.7f);
-                    _device.SetRenderState(RenderState.PointSizeMin, 0.0f);
-                    _device.SetRenderState(RenderState.PointScaleA, 0);
-                    _device.SetRenderState(RenderState.PointScaleB, 0.0f);
-                    _device.SetRenderState(RenderState.PointScaleC, 1.0f);
-                    _device.SetRenderState(RenderState.ZWriteEnable, true);
-
-                    _device.SetTexture(0, null);
-                    _device.VertexFormat = Particle.FVF;
-                    _device.SetStreamSource(0, _vb, 0, Particle.Size);
-                    _device.DrawPrimitives(PrimitiveType.PointList, 0, _size.X*_size.Y);
-                }
-                if (_sprite != null  && _heightMapTexture != null) {
-                    _sprite.Begin(SpriteFlags.None);
-                    _sprite.Draw(_heightMapTexture, null, null, new Vector3(1.0f, 1.0f, 1.0f), Color.White);
-                    _sprite.End();
-                }
-            } catch (Exception ex) {
-                Debug.Print("Error in {0} - {1}\n{2}", ex.TargetSite, ex.Message, ex.StackTrace);
-            }
-        }
-
-        // Editor functions
-        public void MoveRect(Direction dir) {
-            switch (dir) {
-                case Direction.Left:
-                    _selectRect.X--;
-                    break;
-                case Direction.Right:
-                    _selectRect.X++;
-                    break;
-                case Direction.Up:
-                    _selectRect.Y--;
-                    break;
-                case Direction.Down:
-                    _selectRect.Y++;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("dir");
-            }
-            Thread.Sleep(100);
-            CreateParticles();
-        }
+        
         public void RaiseTerrain(Rectangle r, float f) {
             for (var y = r.Top; y <= r.Bottom; y++) {
                 for (var x = r.Left; x <= r.Right; x++) {
@@ -214,7 +138,9 @@ namespace Core {
                     if ( _heightMap[i] > _maxHeight )_heightMap[i] = _maxHeight;
                 }
             }
-            CreateParticles();
+            if (Renderer != null) {
+                Renderer.CreateParticles();
+            }
         }
         public void SmoothTerrain() {
             var hm = new float[_size.X * _size.Y];
@@ -235,15 +161,36 @@ namespace Core {
                 }
             }
             _heightMap = hm;
-            CreateParticles();
+            if (Renderer != null) {
+                Renderer.CreateParticles();
+            }
             Thread.Sleep(500);
+        }
+
+        public void Cap(float capHeight) {
+            MaxHeight = 0.0f;
+            for (var y = 0; y < _size.X; y++) {
+                for (var x = 0; x < _size.X; x++) {
+                    int i = x + y*Size.X;
+                    this[i] -= capHeight;
+                    if (this[i] < 0.0f) {
+                        this[i] = 0.0f;
+                    }
+                    if (this[i] > MaxHeight) {
+                        MaxHeight = this[i];
+                    }
+                }
+            }
         }
 
         public Vector2 Center { get { return new Vector2(_size.X /2.0f, _size.Y / 2.0f);}}
         public float MaxHeight { get { return _maxHeight; } private set { _maxHeight = value; } }
-        public bool ShowSelection { get; set; }
-        public Rectangle SelectionRect { get { return _selectRect; } set { _selectRect = value; } }
+        
+        
         public Point Size { get { return _size; } }
+        public Texture HeightMapTexture { get; private set; }
+
+        public float this[int i] { get { return _heightMap[i]; } private set { _heightMap[i] = value; } }
     }
 
     public enum Direction {

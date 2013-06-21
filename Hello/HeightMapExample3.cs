@@ -14,6 +14,10 @@ namespace Hello {
     class HeightMapExample3 : App {
         private HeightMap _heightmap;
         private float _angle, _angleB;
+
+        private HeightMapRenderer _hmRenderer;
+        private HeightMapEditorSelection _editor;
+
         public override Result Init(int width, int height, bool windowed) {
             CreateWindow(width, height);
             Device = CreateDevice(width, height, windowed);
@@ -21,13 +25,24 @@ namespace Hello {
 
             Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(Device, new Point(50, 50)) {
+            _heightmap = new HeightMap(Device, new Point(50, 50), 15.0f);
+
+            
+
+            _hmRenderer = new HeightMapRenderer(_heightmap, Device) {
                 ShowSelection = true
             };
-            if (_heightmap.CreateParticles().IsFailure) {
+
+            _heightmap.Renderer = _hmRenderer;
+
+            _editor = new HeightMapEditorSelection(_heightmap, _hmRenderer);
+            _hmRenderer.Editor = _editor;
+
+            if (_hmRenderer.CreateParticles().IsFailure) {
                 Debug.Print("Failed to create particles");
                 Quit();
             }
+            
 
             IsRunning = true;
 
@@ -53,23 +68,23 @@ namespace Hello {
                 Device.SetTransform(TransformState.View, view);
                 Device.SetTransform(TransformState.Projection, proj);
 
-                if (Input.IsKeyDown(Key.A) && _heightmap.SelectionRect.Left > 0) {
-                    _heightmap.MoveRect(Direction.Left);
+                if (Input.IsKeyDown(Key.A) && _editor.SelectionRect.Left > 0) {
+                    _editor.MoveRect(Direction.Left);
                 }
-                if (Input.IsKeyDown(Key.D) && _heightmap.SelectionRect.Right < _heightmap.Size.X -1) {
-                    _heightmap.MoveRect(Direction.Right);
+                if (Input.IsKeyDown(Key.D) && _editor.SelectionRect.Right < _heightmap.Size.X - 1) {
+                    _editor.MoveRect(Direction.Right);
                 }
-                if (Input.IsKeyDown(Key.W) && _heightmap.SelectionRect.Top > 0) {
-                    _heightmap.MoveRect(Direction.Up);
+                if (Input.IsKeyDown(Key.W) && _editor.SelectionRect.Top > 0) {
+                    _editor.MoveRect(Direction.Up);
                 }
-                if (Input.IsKeyDown(Key.S) && _heightmap.SelectionRect.Bottom < _heightmap.Size.Y -1) {
-                    _heightmap.MoveRect(Direction.Down);
+                if (Input.IsKeyDown(Key.S) && _editor.SelectionRect.Bottom < _heightmap.Size.Y - 1) {
+                    _editor.MoveRect(Direction.Down);
                 }
                 if (Input.IsKeyDown(Key.NumberPadPlus)) {
-                    _heightmap.RaiseTerrain(_heightmap.SelectionRect, dt * 3.0f);
+                    _heightmap.RaiseTerrain(_editor.SelectionRect, dt * 3.0f);
                 }
                 if (Input.IsKeyDown(Key.NumberPadMinus)) {
-                    _heightmap.RaiseTerrain(_heightmap.SelectionRect, -dt*3.0f);
+                    _heightmap.RaiseTerrain(_editor.SelectionRect, -dt * 3.0f);
                 }
 
                 if (Input.IsKeyDown(Key.Space)) {
@@ -102,9 +117,7 @@ namespace Hello {
         public override Result Render() {
             Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             if (Device.BeginScene().IsSuccess && MainWindow != null) {
-                if (_heightmap != null) {
-                    _heightmap.Render();
-                }
+                if (_hmRenderer != null) _hmRenderer.Render();
 
                 var rs = new[] {
                     new Rectangle(10, 10, 0, 0),
@@ -127,6 +140,7 @@ namespace Hello {
             ReleaseCom(Font);
             ReleaseCom(Device);
             _heightmap.Release();
+            _hmRenderer.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;
         }

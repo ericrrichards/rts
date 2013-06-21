@@ -49,6 +49,8 @@
     <Compile Include="Debug.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="HeightMap.cs" />
+    <Compile Include="HeightMapEditorSelection.cs" />
+    <Compile Include="HeightMapRenderer.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="MathF.cs" />
     <Compile Include="Point.cs" />

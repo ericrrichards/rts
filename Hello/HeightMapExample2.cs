@@ -15,6 +15,8 @@ namespace Hello {
         private float _angle;
         private int _size, _amplitude;
         private HeightMap _heightmap;
+        private HeightMapRenderer _hmRenderer;
+
         public HeightMapExample2() {
             _heightmap = null;
             _angle = 0.0f;
@@ -28,12 +30,14 @@ namespace Hello {
 
             Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(Device, new Point(100, 100));
+            _heightmap = new HeightMap(Device, new Point(100, 100), 15.0f);
             if (_heightmap.CreateRandomHeightMap(MathF.Rand(2000), _size / 10.0f, _amplitude / 10.0f, 9).IsFailure) {
                 Debug.Print("Failed to create random heightmap");
                 Quit();
             }
-            if (_heightmap.CreateParticles().IsFailure) {
+            _hmRenderer = new HeightMapRenderer(_heightmap, Device);
+
+            if (_hmRenderer.CreateParticles().IsFailure) {
                 Debug.Print("Failed to create particles");
                 Quit();
             }
@@ -63,11 +67,13 @@ namespace Hello {
 
                 if (Input.IsKeyDown(Key.Space)) {
                     _heightmap.CreateRandomHeightMap(MathF.Rand(2000), _size/10.0f, _amplitude/10.0f, 9);
-                    _heightmap.CreateParticles();
+                    _hmRenderer.Release();
+                    _hmRenderer = new HeightMapRenderer(_heightmap, Device);
+                    _hmRenderer.CreateParticles();
                     Thread.Sleep(100);
                 }
             }
-            if (Input.IsKeyDown(Key.Escape)) {
+            if (Input.IsKeyDown(Key.Escape)) {  
                 Quit();
                 return ResultCode.Success;
             }
@@ -89,9 +95,7 @@ namespace Hello {
         public override Result Render() {
             Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             if (Device.BeginScene().IsSuccess && MainWindow != null) {
-                if (_heightmap != null) {
-                    _heightmap.Render();
-                }
+                if (_hmRenderer != null) _hmRenderer.Render();
 
                 Font.DrawString(null, String.Format("Size: {0} \t(UP/DOWN Arrow)", _size), new Rectangle(110, 10, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
                 Font.DrawString(null, String.Format("Persistence: {0} \t(Left/Right Arrow)", _amplitude), new Rectangle(110, 30, 0, 0), DrawTextFormat.Left | DrawTextFormat.Top | DrawTextFormat.NoClip, Color.White);
@@ -106,6 +110,7 @@ namespace Hello {
             ReleaseCom(Font);
             ReleaseCom(Device);
             _heightmap.Release();
+            _hmRenderer.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;
         }

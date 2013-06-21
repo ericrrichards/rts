@@ -14,6 +14,7 @@ namespace Hello {
         private float _angle;
         private int _image;
         private HeightMap _heightmap;
+        private HeightMapRenderer _hmRenderer;
 
         public HeightMapExample1() {
             _angle = 0.0f;
@@ -27,12 +28,15 @@ namespace Hello {
 
             Font = new Font(Device, 18, 0, FontWeight.Bold, 1, false, CharacterSet.Default, Precision.Default, FontQuality.Default, PitchAndFamily.Default | PitchAndFamily.DontCare, "Arial");
 
-            _heightmap = new HeightMap(Device, new Point(100, 100));
+            _heightmap = new HeightMap(Device, new Point(100, 100), 15.0f);
             if (_heightmap.LoadFromFile("images/abe.jpg").IsFailure) {
                 Debug.Print("failed to load from file");
                 Quit();
             }
-            if (_heightmap.CreateParticles().IsFailure) {
+
+            _hmRenderer = new HeightMapRenderer(_heightmap, Device);
+
+            if (_hmRenderer.CreateParticles().IsFailure) {
                 Debug.Print("Failed to create particles");
                 Quit();
             }
@@ -73,7 +77,9 @@ namespace Hello {
                             _heightmap.LoadFromFile("images/heightmap.jpg");
                             break;
                     }
-                    _heightmap.CreateParticles();
+                    _hmRenderer.Release();
+                    _hmRenderer = new HeightMapRenderer(_heightmap, Device);
+                    _hmRenderer.CreateParticles();
                     Thread.Sleep(300);
                 }
             }
@@ -88,7 +94,7 @@ namespace Hello {
 
             if (Device.BeginScene().IsSuccess && MainWindow != null) {
 
-                if (_heightmap != null) _heightmap.Render();
+                if (_hmRenderer != null) _hmRenderer.Render();
 
                 var r = MainWindow.ClientRectangle;
 
@@ -104,6 +110,7 @@ namespace Hello {
             ReleaseCom(Font);
             ReleaseCom(Device);
             _heightmap.Release();
+            _hmRenderer.Release();
             Debug.Print("Application terminated");
             return ResultCode.Success;
         }
